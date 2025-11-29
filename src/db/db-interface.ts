@@ -1,7 +1,9 @@
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 import { UserEntity } from 'src/users/entities/user.entity';
-// import { TrackEntity } from 'src/tracks/entities/track.entity';
+import { TrackEntity } from 'src/tracks/entities/track.entity';
+import { CreateTrackDto } from 'src/tracks/dto/create-track.dto';
+import { UpdateTrackDto } from 'src/tracks/dto/update-track.dto';
 
 export interface IInMemoryDB {
   getAllUsers: () => UserEntity[];
@@ -10,9 +12,9 @@ export interface IInMemoryDB {
   updateUser: (id: string, data: UpdateUserDto) => UserEntity | undefined;
   deleteUserById: (id: string) => UserEntity | undefined;
 
-  // getAllTracks: () => TrackEntity[];
-  // getTrackById: (id: string) => TrackEntity | undefined;
-  // createTrack: (data: CreateUserDto) => TrackEntity;
-  // updateTrack: (id: string, data: UpdateUserDto) => TrackEntity | undefined;
-  // deleteTrackById: (id: string) => TrackEntity | undefined;
+  getAllTracks: () => TrackEntity[];
+  getTrackById: (id: string) => TrackEntity | undefined;
+  createTrack: (data: CreateTrackDto) => TrackEntity;
+  updateTrack: (id: string, data: UpdateTrackDto) => TrackEntity | undefined;
+  deleteTrackById: (id: string) => TrackEntity | undefined;
 }

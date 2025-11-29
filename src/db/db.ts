@@ -5,10 +5,14 @@ import { IInMemoryDB } from './db-interface';
 import { map, find, findIndex } from 'lodash';
 import { Injectable } from '@nestjs/common/decorators/core/injectable.decorator';
 import { randomUUID } from 'node:crypto';
+import { TrackEntity } from 'src/tracks/entities/track.entity';
+import { CreateTrackDto } from 'src/tracks/dto/create-track.dto';
+import { UpdateTrackDto } from 'src/tracks/dto/update-track.dto';
 
 @Injectable()
 class InMemoryDB implements IInMemoryDB {
   private users: UserEntity[] = [];
+  private tracks: TrackEntity[] = [];
 
   getAllUsers = () => map(this.users, (x) => x);
 
@@ -52,6 +56,41 @@ class InMemoryDB implements IInMemoryDB {
     }
 
     return user;
+  };
+
+  getAllTracks = () => map(this.tracks, (x) => x);
+
+  getTrackById = (id: string) => find(this.tracks, (x) => x.id === id);
+
+  createTrack = (data: CreateTrackDto) => {
+    const track: TrackEntity = {
+      ...data,
+      id: randomUUID(),
+    };
+
+    this.tracks.push(track);
+
+    return track;
+  };
+
+  updateTrack = (id: string, data: UpdateTrackDto) => {
+    const track = find(this.tracks, (x) => x.id === id);
+
+    if (track) {
+      Object.assign(track, data);
+    }
+    return track;
+  };
+
+  deleteTrackById = (id: string) => {
+    const trackIndex = findIndex(this.tracks, (x) => x.id === id);
+    let track: TrackEntity | undefined = undefined;
+
+    if (~trackIndex) {
+      track = this.tracks.splice(trackIndex, 1)?.[0];
+    }
+
+    return track;
   };
 }
 
