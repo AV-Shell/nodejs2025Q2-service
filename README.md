@@ -17,6 +17,12 @@ git clone https://github.com/AV-Shell/nodejs2025Q2-service.git
 git checkout develop
 ```
 
+## Create .env file from .env.example
+
+```
+copy .env.example .env
+```
+
 ## Installing NPM modules
 
 ```
