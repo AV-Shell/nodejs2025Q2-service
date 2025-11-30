@@ -1,4 +1,4 @@
-export class Album {
+export class AlbumEntity {
   id: string; // uuid
   name: string;
   year: number;

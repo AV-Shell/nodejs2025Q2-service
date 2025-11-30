@@ -1,18 +1,40 @@
+import { Injectable } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
+import { map, find, findIndex } from 'lodash';
+
+import { IInMemoryDB } from './db-interface';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
-import { IInMemoryDB } from './db-interface';
-import { map, find, findIndex } from 'lodash';
-import { Injectable } from '@nestjs/common/decorators/core/injectable.decorator';
-import { randomUUID } from 'node:crypto';
+
 import { TrackEntity } from 'src/tracks/entities/track.entity';
 import { CreateTrackDto } from 'src/tracks/dto/create-track.dto';
 import { UpdateTrackDto } from 'src/tracks/dto/update-track.dto';
+
+import { ArtistEntity } from 'src/artists/entities/artist.entity';
+import { CreateArtistDto } from 'src/artists/dto/create-artist.dto';
+import { UpdateArtistDto } from 'src/artists/dto/update-artist.dto';
+
+import { CreateAlbumDto } from 'src/albums/dto/create-album.dto';
+import { UpdateAlbumDto } from 'src/albums/dto/update-album.dto';
+import { AlbumEntity } from 'src/albums/entities/album.entity';
 
 @Injectable()
 class InMemoryDB implements IInMemoryDB {
   private users: UserEntity[] = [];
   private tracks: TrackEntity[] = [];
+  private artists: ArtistEntity[] = [];
+  private albums: AlbumEntity[] = [];
+
+  private static instance: InMemoryDB;
+
+  constructor() {
+    if (!InMemoryDB.instance) {
+      InMemoryDB.instance = this;
+    }
+
+    return InMemoryDB.instance;
+  }
 
   getAllUsers = () => map(this.users, (x) => x);
 
@@ -91,6 +113,76 @@ class InMemoryDB implements IInMemoryDB {
     }
 
     return track;
+  };
+
+  getAllArtists = () => this.artists;
+
+  getArtistById = (id: string) => find(this.artists, (x) => x.id === id);
+
+  createArtist = (data: CreateArtistDto) => {
+    const artist: ArtistEntity = {
+      ...data,
+      id: randomUUID(),
+    };
+
+    this.artists.push(artist);
+
+    return artist;
+  };
+
+  updateArtist = (id: string, data: UpdateArtistDto) => {
+    const artist = find(this.artists, (x) => x.id === id);
+
+    if (artist) {
+      Object.assign(artist, data);
+    }
+    return artist;
+  };
+
+  deleteArtistById = (id: string) => {
+    const artistIndex = findIndex(this.artists, (x) => x.id === id);
+    let artist: ArtistEntity | undefined = undefined;
+
+    if (~artistIndex) {
+      artist = this.artists.splice(artistIndex, 1)?.[0];
+    }
+
+    return artist;
+  };
+
+  getAllAlbums = () => this.albums;
+
+  getAlbumById = (id: string) => find(this.albums, (x) => x.id === id);
+
+  createAlbum = (data: CreateAlbumDto) => {
+    const album: AlbumEntity = {
+      ...data,
+      id: randomUUID(),
+    };
+
+    this.albums.push(album);
+
+    return album;
+  };
+
+  updateAlbum = (id: string, data: UpdateAlbumDto) => {
+    const album = find(this.albums, (x) => x.id === id);
+
+    if (album) {
+      Object.assign(album, data);
+    }
+    return album;
+  };
+
+  deleteAlbumById = (id: string) => {
+    const albumIndex = findIndex(this.albums, (x) => x.id === id);
+    let album: AlbumEntity | undefined = undefined;
+
+    if (~albumIndex) {
+      album = this.albums.splice(albumIndex, 1)?.[0];
+    }
+
+    return album;
   };
 }
 
