@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { map, find, findIndex } from 'lodash';
+import { map, find, findIndex, filter } from 'lodash';
 
 import { IInMemoryDB } from './db-interface';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
@@ -19,12 +19,19 @@ import { CreateAlbumDto } from 'src/albums/dto/create-album.dto';
 import { UpdateAlbumDto } from 'src/albums/dto/update-album.dto';
 import { AlbumEntity } from 'src/albums/entities/album.entity';
 
+import { FavoriteEntity } from 'src/favorites/entities/favorite.entity';
+
 @Injectable()
 class InMemoryDB implements IInMemoryDB {
   private users: UserEntity[] = [];
   private tracks: TrackEntity[] = [];
   private artists: ArtistEntity[] = [];
   private albums: AlbumEntity[] = [];
+  private favorites: FavoriteEntity = {
+    artists: [],
+    albums: [],
+    tracks: [],
+  };
 
   private static instance: InMemoryDB;
 
@@ -183,6 +190,61 @@ class InMemoryDB implements IInMemoryDB {
     }
 
     return album;
+  };
+
+  getAllFavorites = () => this.favorites;
+
+  addArtistToFavorites = (id: string) => {
+    if (!find(this.favorites.artists, (a) => a === id)) {
+      this.favorites.artists.push(id);
+    }
+    return id;
+  };
+
+  addTrackToFavorites = (id: string) => {
+    if (!find(this.favorites.tracks, (t) => t === id)) {
+      this.favorites.tracks.push(id);
+    }
+
+    return id;
+  };
+
+  addAlbumToFavorites = (id: string) => {
+    if (!find(this.favorites.albums, (a) => a === id)) {
+      this.favorites.albums.push(id);
+    }
+
+    return id;
+  };
+
+  removeTrackFromFavorites = (id: string) => {
+    const trackId = find(this.favorites.tracks, (t) => t === id);
+
+    if (trackId) {
+      this.favorites.tracks = filter(this.favorites.tracks, (t) => t !== id);
+    }
+
+    return trackId;
+  };
+
+  removeAlbumFromFavorites = (id: string) => {
+    const albumId = find(this.favorites.albums, (a) => a === id);
+
+    if (albumId) {
+      this.favorites.albums = filter(this.favorites.albums, (a) => a !== id);
+    }
+
+    return albumId;
+  };
+
+  removeArtistFromFavorites = (id: string) => {
+    const artistId = find(this.favorites.artists, (a) => a === id);
+
+    if (artistId) {
+      this.favorites.artists = filter(this.favorites.artists, (a) => a !== id);
+    }
+
+    return artistId;
   };
 }
 
