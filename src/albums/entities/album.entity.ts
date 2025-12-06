@@ -1,6 +1,61 @@
-export class AlbumEntity {
-  id: string; // uuid
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  OneToOne,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { Track } from '../../tracks/entities/track.entity';
+import { Favorites } from '../../favorites/entities/favorites.entity';
+import { Artist } from '../../artists/entities/artist.entity';
+
+@Entity()
+export class Album {
+  @ApiProperty({
+    example: '0eacf73f-b8f9-4970-8e83-6df0606b9e78',
+    description: 'album id',
+  })
+  @PrimaryGeneratedColumn('uuid')
+  id: string; // uuid v4
+
+  @ApiProperty({ example: 'IvanAbramov Best', description: 'Album name' })
+  @Column({
+    type: 'varchar',
+    default: 'Songs',
+  })
   name: string;
+
+  @ManyToOne(() => Artist, (artist) => artist.tracks, {
+    onDelete: 'SET NULL',
+    nullable: true,
+  })
+  @JoinColumn({ name: 'artistId' })
+  artist: string | null;
+
+  @ApiProperty({ example: '1990', description: 'Album year' })
+  @Column({
+    type: 'int',
+    default: 1,
+  })
   year: number;
+
+  @ApiProperty({
+    example: '0eacf73f-b8f9-4970-8e83-6df0606b9e78',
+    description: 'artist id',
+  })
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    default: null,
+  })
   artistId: string | null; // refers to Artist
+
+  @OneToMany(() => Track, (track) => track.albumId)
+  tracks: Track[];
+
+  @OneToOne(() => Favorites, (favorites) => favorites.album)
+  favorites: Favorites;
 }

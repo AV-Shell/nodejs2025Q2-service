@@ -21,7 +21,7 @@ async function bootstrap() {
     console.log(e);
   }
 
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
   if (doc && pathToFile) {
     SwaggerModule.setup('doc', app, doc);
   }
@@ -29,6 +29,7 @@ async function bootstrap() {
   await app.listen(PORT, () => {
     console.log(`Swagger started from file ${pathToFile} on \\doc endpoint`);
     console.log(`Server started on port = ${PORT}`);
+    console.log('comment this line to check watch reload');
   });
 }
 bootstrap();

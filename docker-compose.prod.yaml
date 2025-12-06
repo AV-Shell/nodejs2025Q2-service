@@ -1,13 +1,10 @@
 services:
   node:
-    build: .
-    container_name: avshell-node2025q4-app
-    image: avshell-node2025q4-app-image
-    develop:
-      watch:
-        - action: sync
-          path: ./src
-          target: /usr/src/app/src
+    build: 
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: avshell-node2025q4-app-prod
+    image: avshell-node2025q4-app-prod-image
     ports:
       - ${PORT}:${PORT}
     depends_on:
