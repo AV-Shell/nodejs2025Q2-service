@@ -5,6 +5,7 @@ import { load as yamlLoad } from 'js-yaml';
 import { readFile } from 'fs/promises';
 import { resolve as pathResolve } from 'path';
 import { SwaggerModule } from '@nestjs/swagger';
+// import myDataSource from './ormconfig';
 
 async function bootstrap() {
   const PORT = process.env.PORT || 4000;
@@ -20,6 +21,10 @@ async function bootstrap() {
     console.log(`can't load doc`);
     console.log(e);
   }
+
+  // await myDataSource.initialize();
+
+  // await myDataSource.runMigrations();
 
   const app = await NestFactory.create(AppModule, { cors: true });
   if (doc && pathToFile) {
