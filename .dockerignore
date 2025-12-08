@@ -1,0 +1,8 @@
+node_modules
+.vscode
+.github
+.git
+test
+logs
+db
+part*
