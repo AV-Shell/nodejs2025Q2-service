@@ -18,8 +18,8 @@ const myDataSource = new DataSource({
   entities: [User, Artist, Album, Track, Favorites],
   migrations: [__dirname + '/migrations/*{.ts,.js}'],
   dropSchema: true,
-  synchronize: false,
-  migrationsRun: true,
+  synchronize: true,
+  migrationsRun: false,
 });
 
 export default myDataSource;

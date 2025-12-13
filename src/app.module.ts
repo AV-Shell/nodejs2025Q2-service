@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -14,6 +14,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 // import { Track } from './tracks/entities/track.entity';
 // import { User } from './users/entities/user.entity';
 import myDataSource from './ormconfig';
+import { LoggerMiddleware } from './logger/logger.middleware';
+import { LoggerModule } from './logger/logger.module';
 
 @Module({
   controllers: [AppController],
@@ -41,9 +43,14 @@ import myDataSource from './ormconfig';
     ArtistsModule,
     AlbumsModule,
     FavoritesModule,
+    LoggerModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}
 
 console.log({
   host: process.env.POSTGRES_HOST,

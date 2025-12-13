@@ -14,7 +14,7 @@ git clone https://github.com/AV-Shell/nodejs2025Q2-service.git
 ## Change branch to develop
 
 ```
-git checkout dev-part2
+git checkout dev-part3
 ```
 
 ## Create .env file from .env.example
@@ -121,10 +121,12 @@ npm install
 
 After application running open new terminal and enter:
 
-To run all tests without authorization
+To run all tests without authorization 
+
+#  In this task all test without authorization must be failure!
 
 ```
-npm run test
+npm run test:withoutauth
 ```
 
 To run only one of all test suites

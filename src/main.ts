@@ -5,13 +5,14 @@ import { load as yamlLoad } from 'js-yaml';
 import { readFile } from 'fs/promises';
 import { resolve as pathResolve } from 'path';
 import { SwaggerModule } from '@nestjs/swagger';
+import { MyLogger } from './logger/logger.service';
 // import myDataSource from './ormconfig';
 
 async function bootstrap() {
   const PORT = process.env.PORT || 4000;
-  console.log('env port', process.env.PORT);
-  console.log('port ', PORT);
   let doc, pathToFile;
+
+  const loggerContainer: { logger: any } = { logger: console };
 
   try {
     pathToFile = pathResolve(__dirname, '../doc/api.yaml');
@@ -30,11 +31,21 @@ async function bootstrap() {
   if (doc && pathToFile) {
     SwaggerModule.setup('doc', app, doc);
   }
+
+  const logger = app.get(MyLogger);
+  loggerContainer.logger = logger;
+  app.useLogger(logger);
+
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(PORT, () => {
-    console.log(`Swagger started from file ${pathToFile} on \\doc endpoint`);
-    console.log(`Server started on port = ${PORT}`);
-    console.log('comment this line to check watch reload');
+    logger.log(`Swagger started from file ${pathToFile} on \\doc endpoint`);
+    logger.log(`Server started on port = ${PORT}`);
+    logger.error('testError');
+    logger.warn('testWarn');
+    logger.log('testlog');
+    logger.verbose('testverbose');
+    logger.debug('testdebug');
   });
 }
+
 bootstrap();
