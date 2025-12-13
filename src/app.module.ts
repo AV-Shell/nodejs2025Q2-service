@@ -16,10 +16,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import myDataSource from './ormconfig';
 import { LoggerMiddleware } from './logger/logger.middleware';
 import { LoggerModule } from './logger/logger.module';
+import { APP_FILTER } from '@nestjs/core';
+import { MyExceptionFilter } from './common/exception.filter';
 
 @Module({
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: MyExceptionFilter,
+    },
+  ],
   imports: [
     ConfigModule.forRoot({ envFilePath: '.env' }),
     TypeOrmModule.forRoot({

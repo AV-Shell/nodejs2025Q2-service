@@ -30,13 +30,9 @@ export class FavoritesService {
       },
     });
 
-    console.log('favorites', favorites);
-
     const result = reduce(
       favorites,
       (m, f) => {
-        console.log();
-
         if (f.type === 'artist') {
           m.artists.push(f.artist);
         }
@@ -56,8 +52,6 @@ export class FavoritesService {
       },
     );
 
-    // console.log(result);
-
     return {
       artists: filter(result.artists, (x) => x),
       albums: filter(result.albums, (x) => x),
@@ -67,7 +61,7 @@ export class FavoritesService {
 
   async addTrack(id: string): Promise<Favorites> {
     const track = await this.tracksRepository.findOne({ where: { id } });
-    console.log('track', track);
+
     if (!track) {
       return;
     }
