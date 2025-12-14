@@ -104,6 +104,37 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Track'
+    SignupUserDto:
+      type: object
+      properties:
+        login:
+          type: string
+          example: Alizee
+        password:
+          type: string
+          example: MyPassword123
+      required:
+        - login
+        - password
+    LoginUserDto:
+      type: object
+      properties:
+        login:
+          type: string
+          example: Alizee
+        password:
+          type: string
+          example: MyPassword123
+      required:
+        - login
+        - password
+    TokensResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string  
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid
@@ -117,6 +148,66 @@ security:
   - bearerAuth: []
 
 paths:
+  /auth/signup:
+    post:
+      tags:
+        - Auth
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupUserDto'
+      responses:
+        201:
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginUserDto'
+      responses:
+        200:
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokensResponse'
+  /auth/refresh:
+    post:
+      tags:
+        - Auth
+      summary: Refresh access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+              required:
+                - refreshToken
+      responses:
+        200:
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokensResponse'
   /user:
     get:
       tags:
@@ -186,7 +277,6 @@ paths:
           description: Bad request. userId is invalid (not uuid)
         404:
           description: User not found
-
     put:
       tags:
         - Users
@@ -215,31 +305,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                title: example
-                properties:
-                  id:
-                    type: string
-                    format: uuid
-                  login:
-                    type: string
-                    example: Alizee
-                  version:
-                    type: integer
-                    example: 2
-                  createAt:
-                    type: integer
-                    example: 461880000000
-                  updateAt:
-                    type: integer
-                    example: 461880000000
+                $ref: '#/components/schemas/User'
         400:
           description: Bad request. userId is invalid (not uuid)
         403:
           description: oldPassword is wrong
         404:
           description: User not found
-
     delete:
       tags:
         - Users

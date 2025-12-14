@@ -18,6 +18,8 @@ services:
       - PORT=${PORT}
     env_file:
       - .env
+    volumes:
+      - ./logs:/usr/src/app/logs
     networks:
       - custom-network
   postgres:
@@ -48,13 +50,11 @@ services:
       retries: 5
     volumes:
       - db_data_volume:/var/lib/postgresql/data
-      - db_log_volume:/var/lib/postgresql/data/pg_log
     networks:
       - custom-network
 
 volumes:
   db_data_volume:
-  db_log_volume:
 networks:
   custom-network:
     driver: bridge
