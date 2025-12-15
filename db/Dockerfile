@@ -1,0 +1,2 @@
+FROM postgres:14.20-alpine3.23
+EXPOSE ${POSTGRES_PORT} 

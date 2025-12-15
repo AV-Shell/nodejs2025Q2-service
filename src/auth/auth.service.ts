@@ -1,0 +1,98 @@
+import { Injectable } from '@nestjs/common';
+import { UsersService } from '../users/users.service';
+import { CreateUserDto } from '../users/dto/create-user.dto';
+import { ResponceUserDto } from '../users/dto/responce-user.dto';
+
+import {
+  BadRequestException,
+  UnauthorizedException,
+  ForbiddenException,
+} from '@nestjs/common/exceptions';
+import { JwtService } from '@nestjs/jwt/dist';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { User } from '../users/entities/user.entity';
+import { ConfigService } from '@nestjs/config';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+  ) {}
+
+  async signup(userDto: CreateUserDto) {
+    const existedUser = await this.usersService.getUserByLogin(userDto.login);
+    if (existedUser) {
+      throw new BadRequestException();
+    }
+
+    return this.usersService.create(userDto);
+  }
+
+  async login(userDto: CreateUserDto) {
+    const user = await this.usersService.validateUser(userDto);
+    return this.generateTokens(user);
+  }
+
+  async refresh(refreshDto: RefreshTokenDto) {
+    const { refreshToken } = refreshDto;
+
+    if (typeof refreshToken !== 'string') {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      const jwtRefreshSecretKey = this.configService.get<string>(
+        'JWT_REFRESH_SECRET_KEY',
+      );
+      const verifyResult = this.jwtService.verify(refreshToken, {
+        secret: jwtRefreshSecretKey,
+      });
+
+      const { userId, login } = verifyResult;
+
+      const existedUser = await this.usersService.getUserByLogin(login);
+      if (!existedUser || existedUser.id !== userId) {
+        throw new ForbiddenException();
+      }
+
+      return this.generateTokens(User.toResponse(existedUser));
+    } catch (error) {
+      throw new ForbiddenException({ message: 'forbidden' });
+    }
+  }
+
+  private async generateTokens(user: ResponceUserDto) {
+    const payload = { userId: user.id, login: user.login };
+    const jwtAccessSecretKey = this.configService.get<string>(
+      'JWT_ACCESS_SECRET_KEY',
+    );
+    const jwtRefreshSecretKey = this.configService.get<string>(
+      'JWT_REFRESH_SECRET_KEY',
+    );
+    const accessExpiresIn =
+      this.configService.get<string>('JWT_ACCESS_EXPIRES_IN') || '30m';
+    const refreshExpiresIn =
+      this.configService.get<string>('JWT_REFRESH_EXPIRES_IN') || '30d';
+
+    console.debug({
+      jwtAccessSecretKey,
+      jwtRefreshSecretKey,
+      accessExpiresIn,
+      refreshExpiresIn,
+    });
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(payload, {
+        secret: jwtAccessSecretKey,
+        expiresIn: accessExpiresIn,
+      }),
+      this.jwtService.signAsync(payload, {
+        secret: jwtRefreshSecretKey,
+        expiresIn: refreshExpiresIn,
+      }),
+    ]);
+
+    return { accessToken, refreshToken };
+  }
+}

@@ -8,7 +8,19 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/AV-Shell/nodejs2025Q2-service.git
+```
+
+## Change branch to develop
+
+```
+git checkout dev-part3
+```
+
+## Create .env file from .env.example
+
+```
+copy .env.example .env
 ```
 
 ## Installing NPM modules
@@ -17,11 +29,81 @@ git clone {repository URL}
 npm install
 ```
 
-## Running application
+# !!! ATTENTION !!!
+### For tracking to work, you need a Docker Compose version greater than 2.20. I had 2.40. 
+
+### You can check this with the command
 
 ```
-npm start
+docker compose version
 ```
+
+# Since the 500 megabyte requirement hasn't changed for three years, and during that time, dependencies and base images size have increased, I consider this requirement invalid. However, since it exists, a special image has been created for it.
+
+# Also watch works only in dev compose versions. You need write --watch flag when you run compose
+
+## Running application in docker: 
+
+ 1) Download and install [Docker](https://docs.docker.com/engine/install/)
+
+ 2) Run in terminal next command : 
+
+
+
+```
+docker compose up --watch
+```
+
+## Stop app in docker:
+
+ 1) Run in terminal next command : 
+
+```
+docker compose down
+```
+
+
+# There are also two normal images for dev and production development.
+# Prod.  
+
+ 2) Run in terminal next command : 
+
+```
+docker compose -f docker-compose.prod.yaml up
+```
+
+## Stop app in docker:
+
+ 1) Run in terminal next command : 
+
+```
+docker compose -f docker-compose.prod.yaml down
+```
+# Dev 
+
+ 2) Run in terminal next command : 
+
+```
+docker compose -f docker-compose.dev.yaml up --watch
+```
+
+## Stop app in docker:
+
+ 1) Run in terminal next command : 
+
+```
+docker compose -f docker-compose.dev.yaml down
+```
+
+
+## Scan docker images
+
+ 1) Run in terminal next command : 
+
+```
+npm run docker:scan
+```
+
 
 After starting the app on port (4000 as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
@@ -29,12 +111,22 @@ For more information about OpenAPI/Swagger please visit https://swagger.io/.
 
 ## Testing
 
-After application running open new terminal and enter:
+Before starting test you need install npm packages
 
-To run all tests without authorization
+open new terminal and enter:
 
 ```
-npm run test
+npm install
+```
+
+After application running open new terminal and enter:
+
+To run all tests without authorization 
+
+#  In this task all test without authorization must be failure!
+
+```
+npm run test:withoutauth
 ```
 
 To run only one of all test suites
